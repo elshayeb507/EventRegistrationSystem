@@ -30,6 +30,10 @@ const Event = sequelize.define('Event', {
       min: 1
     },
   },
+  organizer_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
 }, {
   tableName: 'events',
   timestamps: true,

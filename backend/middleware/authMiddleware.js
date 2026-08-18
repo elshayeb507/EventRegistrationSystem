@@ -1,28 +1,31 @@
 const jwt = require('jsonwebtoken');
+const appError = require('../utils/appError');
+const httpStatus = require('../utils/httpStatus');
 
 const protect = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const error = appError.create('No token provided, access denied', 401, httpStatus.FAIL);
+    return next(error);
+  }
+
+  const token = authHeader.split(' ')[1];
+
   try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ message: 'No token provided, access denied' });
-    }
-
-    const token = authHeader.split(' ')[1];
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
     req.user = decoded;
-
     next();
-  } catch (error) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
+  } catch (err) {
+    const error = appError.create('Invalid or expired token', 401, httpStatus.FAIL);
+    return next(error);
   }
 };
 
 const organizerOnly = (req, res, next) => {
   if (req.user.role !== 'organizer') {
-    return res.status(403).json({ message: 'Access denied: organizers only' });
+    const error = appError.create('Access denied: organizers only', 403, httpStatus.FAIL);
+    return next(error);
   }
   next();
 };

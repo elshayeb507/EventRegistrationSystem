@@ -1,29 +1,46 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Container } from "react-bootstrap";
-import { FaPlusCircle } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import api from "../api/axios";
+import Loader from "../components/Loader";
 
-const initialForm = {
-  title: "",
-  description: "",
-  location: "",
-  event_date: "",
-  capacity: 10,
-};
-
-export default function CreateEvent() {
-  const [form, setForm] = useState(initialForm);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+export default function EditEvent() {
+  const { id } = useParams();
   const navigate = useNavigate();
+
+  const [form, setForm] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const getMinDateTime = () => {
     const now = new Date();
-
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     return now.toISOString().slice(0, 16);
   };
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const { data } = await api.get(`/events/${id}`);
+        const event = data.data.event;
+        const formattedDate = new Date(event.event_date).toISOString().slice(0, 16);
+        setForm({
+          title: event.title,
+          description: event.description || "",
+          location: event.location || "",
+          event_date: formattedDate,
+          capacity: event.capacity,
+        });
+      } catch {
+        setError("تعذّر تحميل بيانات الفعالية");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvent();
+  }, [id]);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -44,35 +61,45 @@ export default function CreateEvent() {
 
     const selectedDate = new Date(form.event_date);
     if (selectedDate <= new Date()) {
-      setError("تاريخ ووقت الفعالية يجب أن يكون في المستقبل ولا يمكن إضافته في الماضي");
+      setError("تاريخ ووقت الفعالية يجب أن يكون في المستقبل ولا يمكن تعديله للماضي");
       return;
     }
 
     const capNum = Number(form.capacity);
     if (!Number.isInteger(capNum) || capNum <= 0) {
-      setError("عدد المقاعد يجب أن يكون رقماً صحبحاً موجباً أكبر من 0");
+      setError("عدد المقاعد يجب أن يكون رقماً صحيحاً موجباً أكبر من 0");
       return;
     }
 
-    setLoading(true);
+    setSaving(true);
     try {
-      const { data } = await api.post("/events", {
+      await api.put(`/events/${id}`, {
         ...form,
         capacity: capNum,
       });
-      navigate(`/events/${data.data.event.id}`);
+      navigate(`/events/${id}`);
     } catch (err) {
-      setError(err.response?.data?.message || "تعذّر إضافة الفعالية");
+      setError(err.response?.data?.message || "تعذّر حفظ التعديلات");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
+
+  if (loading) return <Loader label="جاري تحميل بيانات الفعالية..." />;
+
+  if (!form) {
+    return (
+      <Container className="py-5 text-center">
+        <div className="alert alert-danger">{error || "الفعالية غير موجودة"}</div>
+      </Container>
+    );
+  }
 
   return (
     <Container className="py-5" style={{ maxWidth: 640 }}>
       <div className="d-flex align-items-center gap-2 mb-4">
-        <FaPlusCircle className="text-gold" size={22} />
-        <h4 className="mb-0">إضافة فعالية جديدة</h4>
+        <FaEdit className="text-gold" size={22} />
+        <h4 className="mb-0">تعديل الفعالية</h4>
       </div>
 
       <div className="detail-card">
@@ -88,7 +115,6 @@ export default function CreateEvent() {
               required
               value={form.title}
               onChange={handleChange}
-              placeholder="مثال: مؤتمر الذكاء الاصطناعي 2026"
             />
           </div>
 
@@ -100,7 +126,6 @@ export default function CreateEvent() {
               rows={3}
               value={form.description}
               onChange={handleChange}
-              placeholder="أدخل تفاصيل الفعالية والأجندة..."
             />
           </div>
 
@@ -112,7 +137,6 @@ export default function CreateEvent() {
               className="form-control"
               value={form.location}
               onChange={handleChange}
-              placeholder="مثال: قاعة المؤتمرات الكبرى - المبنى الرئيسي"
             />
           </div>
 
@@ -128,9 +152,6 @@ export default function CreateEvent() {
                 value={form.event_date}
                 onChange={handleChange}
               />
-              <small className="text-muted" style={{ fontSize: "0.8rem" }}>
-                لا يمكن اختيار تاريخ في الماضي
-              </small>
             </div>
             <div className="col-md-4">
               <label className="form-label fw-semibold">عدد المقاعد *</label>
@@ -146,8 +167,8 @@ export default function CreateEvent() {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-gold w-100 py-2.5" disabled={loading}>
-            {loading ? "جاري الإضافة..." : "إضافة الفعالية"}
+          <button type="submit" className="btn btn-gold w-100 py-2.5" disabled={saving}>
+            {saving ? "جاري الحفظ..." : "حفظ التعديلات"}
           </button>
         </form>
       </div>

@@ -6,7 +6,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import EventDetails from "./pages/EventDetails";
 import MyRegistrations from "./pages/MyRegistrations";
+import MyEvents from "./pages/MyEvents";
 import CreateEvent from "./pages/CreateEvent";
+import EditEvent from "./pages/EditEvent";
 import NotFound from "./pages/NotFound";
 
 function App() {
@@ -29,10 +31,28 @@ function App() {
         />
 
         <Route
+          path="/my-events"
+          element={
+            <ProtectedRoute organizerOnly>
+              <MyEvents />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/create-event"
           element={
             <ProtectedRoute organizerOnly>
               <CreateEvent />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/events/:id/edit"
+          element={
+            <ProtectedRoute organizerOnly>
+              <EditEvent />
             </ProtectedRoute>
           }
         />

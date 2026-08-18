@@ -25,5 +25,8 @@ Registration.belongsTo(User, { foreignKey: 'user_id' });
 Event.hasMany(Registration, { foreignKey: 'event_id', onDelete: 'CASCADE' });
 Registration.belongsTo(Event, { foreignKey: 'event_id' });
 
+User.hasMany(Event, { foreignKey: 'organizer_id' });
+Event.belongsTo(User, { foreignKey: 'organizer_id' });
+
 
 module.exports = Registration;

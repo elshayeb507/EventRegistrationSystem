@@ -1,6 +1,6 @@
 import { Link, useNavigate, NavLink } from "react-router-dom";
 import { Container, Nav, Navbar as BsNavbar, Button } from "react-bootstrap";
-import { FaGraduationCap, FaSignOutAlt, FaPlusCircle, FaTicketAlt } from "react-icons/fa";
+import { FaGraduationCap, FaSignOutAlt, FaPlusCircle, FaTicketAlt, FaCalendarCheck } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
@@ -16,7 +16,7 @@ export default function Navbar() {
     <BsNavbar expand="lg" className="app-navbar" variant="dark">
       <Container>
         <BsNavbar.Brand as={Link} to="/" className="brand d-flex align-items-center gap-2">
-          <FaGraduationCap />
+          <FaGraduationCap size={28} />
           نظام تسجيل الفعاليات
         </BsNavbar.Brand>
 
@@ -24,7 +24,7 @@ export default function Navbar() {
         <BsNavbar.Collapse id="main-nav">
           <Nav className="ms-auto align-items-lg-center gap-lg-2">
             <Nav.Link as={NavLink} to="/" end>
-              الفعاليات
+              جميع الفعاليات
             </Nav.Link>
 
             {user && (
@@ -35,10 +35,17 @@ export default function Navbar() {
             )}
 
             {isOrganizer && (
-              <Nav.Link as={NavLink} to="/create-event">
-                <FaPlusCircle className="me-1" />
-                إضافة فعالية
-              </Nav.Link>
+              <>
+                <Nav.Link as={NavLink} to="/my-events">
+                  <FaCalendarCheck className="me-1" />
+                  فعالياتي
+                </Nav.Link>
+
+                <Nav.Link as={NavLink} to="/create-event">
+                  <FaPlusCircle className="me-1" />
+                  إضافة فعالية
+                </Nav.Link>
+              </>
             )}
 
             {!user ? (
@@ -51,8 +58,11 @@ export default function Navbar() {
                 </Button>
               </>
             ) : (
-              <div className="d-flex align-items-center gap-2 ms-lg-2">
-                <span className="text-light small">أهلاً، {user.name.split(" ")[0]}</span>
+              <div className="d-flex align-items-center gap-2 ms-lg-2 pt-2 pt-lg-0">
+                <span className="text-light small">
+                  أهلاً، {user.name?.split(" ")[0]}
+                  {isOrganizer && <span className="badge badge-organizer ms-1">منظّم</span>}
+                </span>
                 <Button
                   variant="outline-light"
                   size="sm"

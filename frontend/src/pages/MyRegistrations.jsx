@@ -24,7 +24,7 @@ export default function MyRegistrations() {
     setLoading(true);
     try {
       const { data } = await api.get("/registrations/my");
-      setRegistrations(data);
+      setRegistrations(data.data.registrations);
     } catch {
       setError("تعذّر تحميل تسجيلاتك");
     } finally {
@@ -92,9 +92,8 @@ export default function MyRegistrations() {
                   <td>{r.Event ? formatDate(r.Event.event_date) : "—"}</td>
                   <td>
                     <span
-                      className={`status-pill ${
-                        r.status === "confirmed" ? "status-confirmed" : "status-cancelled"
-                      }`}
+                      className={`status-pill ${r.status === "confirmed" ? "status-confirmed" : "status-cancelled"
+                        }`}
                     >
                       {r.status === "confirmed" ? "مؤكد" : "ملغى"}
                     </span>
