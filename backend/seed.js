@@ -140,7 +140,7 @@ async function seedData() {
     // تسجيلات لـ event4 (منتهية)
     await Registration.create({ user_id: user3.id, event_id: event4.id, status: 'confirmed' });
 
-    console.log('\n✅ Demo Data Seeded Successfully!');
+    console.log('\n Demo Data Seeded Successfully!');
     console.log('--------------------------------------------------');
     console.log('Organizer Login: ahmed@organizer.com / Password123!');
     console.log('Organizer Login: sara@organizer.com  / Password123!');
