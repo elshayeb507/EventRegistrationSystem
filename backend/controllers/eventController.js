@@ -15,7 +15,7 @@ const getAllEvents = asyncWapper(async (req, res, next) => {
       include: [
         [
           sequelize.literal(
-            "(SELECT COUNT(*) FROM registrations WHERE registrations.event_id = Event.id AND registrations.status = 'confirmed')"
+            "(SELECT COUNT(*) FROM registrations WHERE registrations.event_id = \"Event\".id AND registrations.status = 'confirmed')"
           ),
           'registeredCount',
         ],
@@ -51,7 +51,7 @@ const getEventById = asyncWapper(async (req, res, next) => {
       include: [
         [
           sequelize.literal(
-            "(SELECT COUNT(*) FROM registrations WHERE registrations.event_id = Event.id AND registrations.status = 'confirmed')"
+            "(SELECT COUNT(*) FROM registrations WHERE registrations.event_id = \"Event\".id AND registrations.status = 'confirmed')"
           ),
           'registeredCount',
         ],
@@ -84,7 +84,7 @@ const getMyEvents = asyncWapper(async (req, res, next) => {
       include: [
         [
           sequelize.literal(
-            "(SELECT COUNT(*) FROM registrations WHERE registrations.event_id = Event.id AND registrations.status = 'confirmed')"
+            "(SELECT COUNT(*) FROM registrations WHERE registrations.event_id = \"Event\".id AND registrations.status = 'confirmed')"
           ),
           'registeredCount',
         ],
@@ -109,7 +109,7 @@ const getMyEvents = asyncWapper(async (req, res, next) => {
       'capacity',
       [
         sequelize.literal(
-          "(SELECT COUNT(*) FROM registrations WHERE registrations.event_id = Event.id AND registrations.status = 'confirmed')"
+          "(SELECT COUNT(*) FROM registrations WHERE registrations.event_id = \"Event\".id AND registrations.status = 'confirmed')"
         ),
         'registeredCount',
       ],
